@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMG Downloader | YouTube Video & Audio Downloader by AtaLioMego™</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 20px;
+        }
+
+        .card {
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .form-control-lg {
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+
+            .btn-lg {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .table thead {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <script>
+        $(function () {
+            $("#btn_fetch").click(function (e) {
+                e.preventDefault();
+                let url = $("#txt_url").val();
+                let oThis = $(this);
+                oThis.attr('disabled', true);
+
+                $.get('https://yt-dlp-api.peterli.website/video/?video_url=' + url, function (data) {
+                    oThis.attr('disabled', false);
+
+                    let links = data['links'];
+                    let error = data['error'];
+
+                    if (error) {
+                        alert('Error Message: ' + error);
+                        return false;
+                    }
+
+                    if (links.length === 0) {
+                        alert('No video links found!');
+                        return false;
+                    }
+
+                    let tbodyVideoLists = '';
+                    let dataIndex = 1;
+
+                    for (let index in links) {
+                        tbodyVideoLists += `<tr>
+                            <th scope="row">${dataIndex}</th>
+                            <td>${links[index]['format']}</td>
+                            <td>${links[index]['itag']}</td>
+                            <td><a href="./download.php?video_url=${links[index]['url']}" class="btn btn-sm btn-primary">Download</a></td>
+                        </tr>`;
+                        dataIndex += 1;
+                    }
+
+                    $('#video-lists').html(tbodyVideoLists);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <main role="main" class="container">
+        <h1 class="text-center text-primary">AMG Downloader</h1>
+        <p class="text-center text-muted">YouTube Video & Audio Downloader by AtaLioMego™</p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <form class="card card-sm p-3">
+                    <div class="form-group row align-items-center">
+                        <div class="col-12 col-md-9">
+                            <input id="txt_url" class="form-control form-control-lg" type="text" placeholder="Paste YouTube video URL here">
+                        </div>
+                        <div class="col-12 col-md-3 mt-2 mt-md-0 text-center text-md-right">
+                            <button id="btn_fetch" class="btn btn-lg btn-success w-100" type="button">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Video Format</th>
+                        <th scope="col">itag</th>
+                        <th scope="col">Download Link</th>
+                    </tr>
+                </thead>
+                <tbody id="video-lists"></tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>
